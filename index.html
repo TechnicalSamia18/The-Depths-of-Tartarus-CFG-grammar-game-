@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Depths of Tartarus — 3D Incantation Roguelite</title>
+    <meta name="description" content="Claw your way out of a layered celestial prison in this 3D atmospheric puzzle-combat roguelite. Speak the runes of power to break the barriers of Holy Light.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Share+Tech+Mono&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- Three.js (Local) -->
+    <script src="three.min.js"></script>
+</head>
+<body>
+    <!-- Screen Flash Overlay for damage and spell cast feedback -->
+    <div id="damage-flash" class="flash-overlay"></div>
+    <div id="cast-flash" class="flash-overlay"></div>
+
+    <!-- Loading Screen 
+    <div id="loader" class="screen-overlay active">
+        <div class="loader-content">
+            <div class="runic-spinner"></div>
+            <h2>INSCRIBING RUNES OF POWER...</h2>
+            <p>Loading the underworld engine...</p>
+        </div>
+    </div> -->
+
+    <!-- Start Page -->
+    <div id="start-screen" class="screen-overlay active">
+        <div class="start-bg"></div>
+        <div class="start-content">
+            <h1 class="game-title">THE DEPTHS OF TARTARUS</h1>
+            <p class="game-tagline">Speak the ancient runic tongue to crack the celestial gates.</p>
+            
+            <div class="intro-box">
+                <p>You are an ancient Demon imprisoned in a layered celestial dungeon. You cannot strike or shoot. Your only weapon is <strong>language</strong>. Type incantations into the console to unleash spells. Valid syntax deals devastating damage; incorrect grammar causes the Holy Light to burn you.</p>
+                <div class="rules-preview">
+                    <strong>Incantation Rules:</strong>
+                    <ul>
+                        <li>Spells begin with elements (e.g. <code>IGNIS</code>, <code>AQUA</code>, <code>TERRA</code>) or nested commands.</li>
+                        <li>Format: <code>invoke(SPELL)</code>. You can nest them: <code>invoke(invoke(IGNIS))</code>.</li>
+                        <li>Fury chains are linked with <code>+</code> and must end with <code>!</code>.</li>
+                        <li>Example: <code>invoke(invoke(IGNIS) + AQUA) + TERRA!</code></li>
+                    </ul>
+                </div>
+            </div>
+
+            <button id="play-button" class="btn btn-primary">PLAY GAME</button>
+        </div>
+    </div>
+
+    <!-- Game HUD Layer (visible during play) -->
+    <div id="hud-container" class="hidden">
+        <!-- Demon Stats -->
+        <div id="player-stats" class="hud-panel glass-panel">
+            <h3>DEMON INCARNATE</h3>
+            <div class="bar-container">
+                <span class="bar-label">HP</span>
+                <div class="bar-bg">
+                    <div id="hp-bar" class="bar-fill red-fill" style="width: 100%;"></div>
+                </div>
+                <span id="hp-text" class="bar-value">100 / 100</span>
+            </div>
+            <div class="checkpoint-info">
+                <span>Checkpoint:</span> <strong id="checkpoint-name">Entrance Gate</strong>
+            </div>
+        </div>
+
+        <!-- Target Info -->
+        <div id="target-stats" class="hud-panel glass-panel hidden">
+            <h3 id="target-name">HOLY GATE</h3>
+            <div class="bar-container">
+                <span class="bar-label">BARRIER</span>
+                <div class="bar-bg">
+                    <div id="target-hp-bar" class="bar-fill gold-fill" style="width: 100%;"></div>
+                </div>
+                <span id="target-hp-text" class="bar-value">100 / 100</span>
+            </div>
+            <div id="target-requirement" class="requirement-box">
+                Syntax Hint: Match the runes.
+            </div>
+        </div>
+
+        <!-- Live Formula Display -->
+        <div id="formula-display" class="hud-panel glass-panel">
+            <h3>MAGICAL POTENCY</h3>
+            <div class="formula-details">
+                <div class="formula-line">
+                    <span class="formula-label">BASE DMG:</span>
+                    <span id="formula-base" class="formula-val">10</span>
+                </div>
+                <div class="formula-line">
+                    <span class="formula-label">DEPTH MULTIPLIER (1 + d):</span>
+                    <span id="formula-depth" class="formula-val">1.0</span>
+                </div>
+                <div class="formula-line">
+                    <span class="formula-label">FURY MULTIPLIER (1 + f):</span>
+                    <span id="formula-fury" class="formula-val">1.0</span>
+                </div>
+                <hr class="formula-hr">
+                <div class="formula-line total-line">
+                    <span class="formula-label">ESTIMATED DMG:</span>
+                    <span id="formula-total" class="formula-val glow-red">10</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Logs Console -->
+        <div id="log-console" class="glass-panel">
+            <div class="console-header">BATTLE LOGS</div>
+            <div id="console-logs" class="console-body">
+                <div>[SYSTEM] Underworld engine initialized.</div>
+            </div>
+        </div>
+
+        <!-- Runic Self-Check Results (Developer panel / verification) -->
+        <div id="test-results-panel" class="glass-panel">
+            <div class="console-header">GRAMMAR SYSTEM DIAGNOSTICS</div>
+            <div id="test-results-body" class="console-body">
+                Running grammar checks...
+            </div>
+        </div>
+
+        <!-- Gameplay Prompt -->
+        <div id="action-prompt" class="game-prompt hidden">
+            APPROACH THE LIGHT BARRIER TO INSCRIBE INCANTATIONS
+        </div>
+    </div>
+
+    <!-- Runic Input Console Panel (slides up when near a Gate) -->
+    <div id="runic-terminal-container" class="hidden">
+        <div class="terminal-panel glass-panel glow-red">
+            <div class="terminal-header">
+                <span class="pulse-red">● INSCRIBING RUNIC SPELL</span>
+                <span id="terminal-instructions">Inscribe words of doom...</span>
+            </div>
+            <form id="incantation-form" autocomplete="off" onsubmit="return false;">
+                <div class="input-wrapper">
+                    <span class="terminal-prompt">&gt;</span>
+                    <input type="text" id="incantation-input" placeholder="Enter Dark Incantation..." autofocus disabled>
+                    <button type="submit" id="cast-button" class="btn btn-cast">CAST</button>
+                </div>
+            </form>
+            <div class="rune-helper-bar">
+                <span>Runic Elements:</span>
+                <button class="rune-btn" data-rune="IGNIS">IGNIS</button>
+                <button class="rune-btn" data-rune="AQUA">AQUA</button>
+                <button class="rune-btn" data-rune="TERRA">TERRA</button>
+                <button class="rune-btn" data-rune="VENTUS">VENTUS</button>
+                <button class="rune-btn" data-rune="SOL">SOL</button>
+                <button class="rune-btn" data-rune="LUNA">LUNA</button>
+                <span style="margin-left: auto;">Structure:</span>
+                <button class="rune-btn" data-rune="invoke()">invoke()</button>
+                <button class="rune-btn" data-rune=" + ">+</button>
+                <button class="rune-btn" data-rune="!">!</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Canvas for 3D Game Renderer -->
+    <div id="game-canvas-container">
+        <canvas id="game-canvas"></canvas>
+    </div>
+
+    <!-- Game Over / Victory Overlay Screen -->
+    <div id="end-screen" class="screen-overlay hidden">
+        <div class="end-content">
+            <h2 id="end-title">YOU PERISHED</h2>
+            <p id="end-message">The holy light burned your soul back to the abyss.</p>
+            <button id="end-button" class="btn btn-primary">TRY AGAIN</button>
+        </div>
+    </div>
+
+    <!-- Game Scripts -->
+    <script src="grammar.js"></script>
+    <script src="audio.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>

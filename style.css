@@ -1,0 +1,759 @@
+/* Reset & Core Styling */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+body, html {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: #050202;
+    font-family: 'Inter', sans-serif;
+    color: #e0d0d0;
+}
+
+/* Base Headings */
+h1, h2, h3 {
+    font-family: 'Cinzel', serif;
+    letter-spacing: 2px;
+}
+
+/* Colors & Variables */
+:root {
+    --color-bg: #070303;
+    --color-red-glow: #ff2a2a;
+    --color-red-dim: #7f0000;
+    --color-gold-glow: #ffcc00;
+    --color-gold-dim: #a67c00;
+    --color-holy-glow: #ffffff;
+    --color-holy-blue: #00ffff;
+    --color-panel-bg: rgba(10, 4, 4, 0.75);
+    --border-glow-red: 1px solid rgba(255, 42, 42, 0.4);
+    --border-glow-gold: 1px solid rgba(255, 204, 0, 0.4);
+}
+
+/* 3D Canvas Container */
+#game-canvas-container {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+#game-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Screen Overlays (Loaders, Menus, End Screen) */
+.screen-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 1.2s ease-in-out, visibility 1.2s;
+    background: radial-gradient(circle at center, rgba(15, 5, 5, 0.95) 0%, rgba(5, 2, 2, 0.99) 100%);
+}
+
+.screen-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* Loader Styles */
+.loader-content {
+    text-align: center;
+}
+
+.runic-spinner {
+    width: 80px;
+    height: 80px;
+    border: 3px double transparent;
+    border-top: 3px double var(--color-red-glow);
+    border-bottom: 3px double var(--color-red-glow);
+    border-radius: 50%;
+    margin: 0 auto 30px;
+    animation: spinRunic 2s linear infinite;
+    position: relative;
+}
+
+.runic-spinner::before {
+    content: '';
+    position: absolute;
+    top: 10px; left: 10px; right: 10px; bottom: 10px;
+    border: 1px solid rgba(255, 204, 0, 0.2);
+    border-radius: 50%;
+    border-left-color: var(--color-gold-glow);
+    animation: spinRunicCounter 1.5s linear infinite;
+}
+
+@keyframes spinRunic {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes spinRunicCounter {
+    0% { transform: rotate(360deg); }
+    100% { transform: rotate(0deg); }
+}
+
+#loader h2 {
+    color: var(--color-red-glow);
+    text-shadow: 0 0 10px rgba(255, 42, 42, 0.6);
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+#loader p {
+    font-size: 0.9rem;
+    color: #887878;
+    letter-spacing: 1px;
+}
+
+/* Start Screen specific */
+#start-screen {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+}
+
+.start-bg {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-image: url('assets/demon_bg.jpg');
+    background-size: cover;
+    background-position: center;
+    filter: brightness(0.4) contrast(1.1) saturate(0.9);
+    transition: transform 10s ease-out;
+}
+
+#start-screen:not(.hidden) .start-bg {
+    transform: scale(1.05);
+}
+
+#start-screen::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(circle at center, rgba(12, 4, 4, 0.1) 0%, rgba(6, 2, 2, 0.85) 80%, rgba(0, 0, 0, 0.98) 100%);
+    pointer-events: none;
+}
+
+.start-content {
+    position: relative;
+    z-index: 2;
+    max-width: 750px;
+    width: 90%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px;
+    background: rgba(10, 4, 4, 0.8);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 42, 42, 0.25);
+    border-radius: 12px;
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.9), 0 0 20px rgba(255, 42, 42, 0.15);
+    animation: fadeInStart 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeInStart {
+    0% { transform: translateY(30px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+.game-title {
+    font-size: 3.2rem;
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 0 0 10px rgba(255, 42, 42, 0.8), 0 0 30px rgba(255, 42, 42, 0.4);
+    margin-bottom: 5px;
+    letter-spacing: 5px;
+}
+
+.game-tagline {
+    font-family: 'Cinzel', serif;
+    font-size: 1.05rem;
+    color: var(--color-gold-glow);
+    text-shadow: 0 0 8px rgba(255, 204, 0, 0.5);
+    margin-bottom: 25px;
+    letter-spacing: 2px;
+}
+
+.intro-box {
+    text-align: left;
+    margin-bottom: 30px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #cbbaba;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 20px;
+}
+
+.intro-box p {
+    margin-bottom: 15px;
+}
+
+.rules-preview {
+    background: rgba(0, 0, 0, 0.4);
+    border-left: 3px solid var(--color-red-glow);
+    padding: 12px 18px;
+    font-size: 0.88rem;
+    border-radius: 0 6px 6px 0;
+}
+
+.rules-preview strong {
+    color: #fff;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.rules-preview ul {
+    list-style: square;
+    margin-left: 20px;
+}
+
+.rules-preview li {
+    margin-bottom: 4px;
+}
+
+.rules-preview code {
+    background: rgba(255, 42, 42, 0.15);
+    color: var(--color-red-glow);
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-family: 'Share Tech Mono', monospace;
+    font-weight: bold;
+}
+
+/* Button Component */
+.btn {
+    font-family: 'Cinzel', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    padding: 12px 40px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    letter-spacing: 3px;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    outline: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--color-red-dim) 0%, #aa0000 100%);
+    color: #fff;
+    border: 1px solid var(--color-red-glow);
+    box-shadow: 0 0 15px rgba(255, 42, 42, 0.3);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #a20000 0%, var(--color-red-glow) 100%);
+    box-shadow: 0 0 25px rgba(255, 42, 42, 0.6);
+    transform: translateY(-2px);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+/* HUD Overlay Layer */
+#hud-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Let clicks pass to 3D canvas */
+    z-index: 100;
+    transition: opacity 0.5s ease;
+}
+
+#hud-container.hidden {
+    opacity: 0;
+}
+
+/* Panel Design */
+.glass-panel {
+    background: var(--color-panel-bg);
+    backdrop-filter: blur(5px);
+    border: var(--border-glow-red);
+    border-radius: 6px;
+    padding: 15px;
+    position: absolute;
+    pointer-events: auto; /* Enable clicks inside panels */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5), 0 0 5px rgba(255, 42, 42, 0.05);
+}
+
+.hud-panel h3 {
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 5px;
+    color: #fff;
+}
+
+/* Player Stats Panel (Top Left) */
+#player-stats {
+    top: 45px;
+    left: 20px;
+    width: 280px;
+}
+
+.checkpoint-info {
+    font-size: 0.75rem;
+    margin-top: 8px;
+    color: #887878;
+    display: flex;
+    justify-content: space-between;
+}
+
+.checkpoint-info strong {
+    color: var(--color-red-glow);
+}
+
+/* Target Stats Panel (Top Center) */
+#target-stats {
+    top: 45px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 380px;
+    border: var(--border-glow-gold);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.6), 0 0 8px rgba(255, 204, 0, 0.1);
+}
+
+#target-stats h3 {
+    text-align: center;
+    border-bottom-color: rgba(255, 204, 0, 0.2);
+    color: var(--color-gold-glow);
+    text-shadow: 0 0 5px rgba(255, 204, 0, 0.3);
+}
+
+#target-stats.hidden {
+    display: none;
+}
+
+.requirement-box {
+    margin-top: 8px;
+    font-size: 0.8rem;
+    background: rgba(255, 204, 0, 0.08);
+    padding: 6px;
+    border-radius: 4px;
+    border-left: 3px solid var(--color-gold-glow);
+    color: #eee0c0;
+    text-align: center;
+    font-family: 'Share Tech Mono', monospace;
+}
+
+/* Potency Formula Panel (Top Right) */
+#formula-display {
+    top: 45px;
+    right: 20px;
+    width: 320px;
+}
+
+.formula-details {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.85rem;
+}
+
+.formula-line {
+    display: flex;
+    justify-content: space-between;
+    margin: 5px 0;
+}
+
+.formula-label {
+    color: #887878;
+}
+
+.formula-val {
+    font-weight: bold;
+    color: #fff;
+}
+
+.formula-hr {
+    border: none;
+    border-top: 1px dashed rgba(255, 255, 255, 0.15);
+    margin: 8px 0;
+}
+
+.total-line {
+    font-size: 1rem;
+    color: var(--color-red-glow);
+}
+
+.glow-red {
+    text-shadow: 0 0 8px var(--color-red-glow);
+    color: #ff5555;
+}
+
+/* Stat Bar Components */
+.bar-container {
+    width: 100%;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.bar-label {
+    width: 60px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: #887878;
+}
+
+.bar-bg {
+    flex-grow: 1;
+    height: 12px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+}
+
+.bar-fill {
+    height: 100%;
+    width: 0%;
+    transition: width 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.red-fill {
+    background: linear-gradient(90deg, #880000 0%, var(--color-red-glow) 100%);
+    box-shadow: 0 0 8px rgba(255, 42, 42, 0.5);
+}
+
+.gold-fill {
+    background: linear-gradient(90deg, #aa7700 0%, var(--color-gold-glow) 100%);
+    box-shadow: 0 0 8px rgba(255, 204, 0, 0.5);
+}
+
+.bar-value {
+    width: 70px;
+    text-align: right;
+    font-size: 0.75rem;
+    font-family: 'Share Tech Mono', monospace;
+    color: #fff;
+}
+
+/* System Logs & Test Results Panels (Bottom Left & Right) */
+#log-console {
+    bottom: 20px;
+    left: 20px;
+    width: 320px;
+    height: 160px;
+    display: flex;
+    flex-direction: column;
+}
+
+#test-results-panel {
+    bottom: 20px;
+    right: 20px;
+    width: 320px;
+    height: 160px;
+    display: flex;
+    flex-direction: column;
+}
+
+.console-header {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: #aaa;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    padding-bottom: 4px;
+    margin-bottom: 6px;
+    letter-spacing: 1px;
+}
+
+.console-body {
+    flex-grow: 1;
+    overflow-y: auto;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    color: #bbb8b8;
+}
+
+.console-body div {
+    margin-bottom: 4px;
+}
+
+/* Log Color Helpers */
+.log-success { color: #55ff55; }
+.log-error { color: #ff5555; }
+.log-info { color: #55ffff; }
+.log-gold { color: var(--color-gold-glow); }
+
+/* Custom scrollbars for consoles */
+.console-body::-webkit-scrollbar {
+    width: 4px;
+}
+.console-body::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.2);
+}
+.console-body::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+}
+
+/* Gameplay Prompts */
+.game-prompt {
+    position: absolute;
+    bottom: 180px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(5, 2, 2, 0.85);
+    border: 1px double var(--color-red-glow);
+    padding: 10px 25px;
+    border-radius: 4px;
+    color: #fff;
+    font-family: 'Cinzel', serif;
+    font-size: 0.95rem;
+    font-weight: bold;
+    text-shadow: 0 0 5px rgba(255, 42, 42, 0.6);
+    box-shadow: 0 0 20px rgba(0,0,0,0.8), inset 0 0 10px rgba(255, 42, 42, 0.1);
+    animation: pulsePrompt 1.8s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes pulsePrompt {
+    0%, 100% { opacity: 0.35; transform: translate(-50%, 0) scale(0.98); }
+    50% { opacity: 1; transform: translate(-50%, -2px) scale(1.02); }
+}
+
+/* Runic Terminal Container (Bottom Center) */
+#runic-terminal-container {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    z-index: 105;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+}
+
+#runic-terminal-container.hidden {
+    transform: translate(-50%, 80px);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.terminal-panel {
+    border: var(--border-glow-red);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 20px rgba(255, 42, 42, 0.15);
+    background: rgba(7, 3, 3, 0.85);
+    backdrop-filter: blur(8px);
+    padding: 15px;
+    border-radius: 8px;
+    pointer-events: auto;
+}
+
+.terminal-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    font-family: 'Cinzel', serif;
+    color: #fff;
+    margin-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 5px;
+}
+
+.pulse-red {
+    color: var(--color-red-glow);
+    text-shadow: 0 0 5px var(--color-red-glow);
+    animation: blinkRed 1s steps(2, start) infinite;
+}
+
+@keyframes blinkRed {
+    to { visibility: hidden; }
+}
+
+#terminal-instructions {
+    color: #887878;
+}
+
+/* Terminal Input Row */
+.input-wrapper {
+    display: flex;
+    align-items: center;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 4px;
+    padding: 5px 12px;
+    margin-bottom: 10px;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+}
+
+.input-wrapper:focus-within {
+    border-color: rgba(255, 42, 42, 0.5);
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.5), 0 0 8px rgba(255, 42, 42, 0.2);
+}
+
+.terminal-prompt {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--color-red-glow);
+    margin-right: 10px;
+    text-shadow: 0 0 5px rgba(255, 42, 42, 0.4);
+}
+
+#incantation-input {
+    flex-grow: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #fff;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1.15rem;
+    letter-spacing: 1px;
+    padding: 5px 0;
+}
+
+#incantation-input::placeholder {
+    color: rgba(255,255,255,0.2);
+}
+
+/* Cast Button */
+.btn-cast {
+    font-family: 'Cinzel', serif;
+    font-size: 0.9rem;
+    padding: 6px 20px;
+    border: 1px solid var(--color-red-glow);
+    background: rgba(255, 42, 42, 0.15);
+    color: #fff;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 1px;
+    font-weight: bold;
+}
+
+.btn-cast:hover:not(:disabled) {
+    background: var(--color-red-glow);
+    box-shadow: 0 0 10px var(--color-red-glow);
+    color: #000;
+}
+
+.btn-cast:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #666;
+}
+
+/* Runic Helper Bar */
+.rune-helper-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.72rem;
+    color: #665c5c;
+    flex-wrap: wrap;
+}
+
+.rune-btn {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #aaa;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    padding: 3px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.rune-btn:hover {
+    background: rgba(255, 42, 42, 0.12);
+    border-color: rgba(255, 42, 42, 0.3);
+    color: #fff;
+}
+
+/* End Game Over Screen Specifics */
+.end-content {
+    background: rgba(10, 4, 4, 0.95);
+    border: 1px solid var(--color-red-glow);
+    padding: 50px;
+    border-radius: 12px;
+    text-align: center;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.9), 0 0 20px rgba(255, 42, 42, 0.15);
+}
+
+.end-content h2 {
+    font-size: 2.5rem;
+    color: var(--color-red-glow);
+    text-shadow: 0 0 15px rgba(255, 42, 42, 0.7);
+    margin-bottom: 15px;
+}
+
+.end-content p {
+    color: #bfaaaa;
+    line-height: 1.5;
+    margin-bottom: 30px;
+    font-size: 0.95rem;
+}
+
+/* Flash overlays */
+.flash-overlay {
+    position: fixed;
+    top:0; left:0; width:100%; height:100%;
+    z-index: 999;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.05s ease-out;
+}
+
+#damage-flash {
+    box-shadow: inset 0 0 100px rgba(255, 0, 0, 0.9);
+    background: rgba(255, 0, 0, 0.15);
+}
+
+#damage-flash.flash-active {
+    opacity: 1;
+    transition: none; /* instant on */
+}
+
+#cast-flash {
+    box-shadow: inset 0 0 80px rgba(0, 255, 255, 0.6);
+    background: rgba(0, 255, 255, 0.05);
+}
+
+#cast-flash.flash-active {
+    opacity: 1;
+    transition: none; /* instant on */
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #0d0606;
+}
+::-webkit-scrollbar-thumb {
+    background: #441111;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #771111;
+}
