@@ -96,11 +96,13 @@ function parse(tokens) {
         
         const maxDepth = Math.max(...terms.map(t => t.depth));
         const sumFury = terms.reduce((acc, t) => acc + t.fury, 0);
-        
+        const elements = terms.reduce((acc, t) => acc.concat(t.elements), []);
+
         return {
             type: 'Expression',
             depth: maxDepth,
             fury: sumFury + furyCount,
+            elements: elements,
             terms: terms
         };
     }
@@ -117,7 +119,8 @@ function parse(tokens) {
                 type: 'ElementTerm',
                 value: t.value,
                 depth: 0,
-                fury: 0
+                fury: 0,
+                elements: [t.value]
             };
         } else if (t.type === 'INVOKE') {
             consume('INVOKE');
@@ -134,6 +137,7 @@ function parse(tokens) {
                 type: 'InvokeTerm',
                 depth: expr.depth + 1,
                 fury: expr.fury,
+                elements: expr.elements,
                 expr: expr
             };
         } else if (t.type === 'INVALID') {
@@ -181,12 +185,13 @@ function processSpell(spellText) {
         
         const ast = parse(tokens);
         const damage = BASE_DAMAGE * (1 + ast.depth) * (1 + ast.fury);
-        
+
         return {
             valid: true,
             depth: ast.depth,
             fury: ast.fury,
             damage: damage,
+            elements: Array.from(new Set(ast.elements)),
             error: null
         };
     } catch (err) {
@@ -195,6 +200,7 @@ function processSpell(spellText) {
             depth: 0,
             fury: 0,
             damage: 0,
+            elements: [],
             error: err.message
         };
     }

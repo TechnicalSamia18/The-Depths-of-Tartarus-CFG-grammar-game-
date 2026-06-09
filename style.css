@@ -132,10 +132,10 @@ h1, h2, h3 {
 .start-bg {
     position: absolute;
     top: 0; left: 0; width: 100%; height: 100%;
-    background-image: url('assets/demon_bg.jpg');
+    background-image: url('assets/start-bg.jpg');
     background-size: cover;
     background-position: center;
-    filter: brightness(0.4) contrast(1.1) saturate(0.9);
+    filter: brightness(0.7) contrast(1.15) saturate(1.05);
     transition: transform 10s ease-out;
 }
 
@@ -308,10 +308,11 @@ h1, h2, h3 {
 }
 
 /* Player Stats Panel (Top Left) */
+/* Moved to the right, under the Magical Potency panel, so it no longer covers the minimap */
 #player-stats {
-    top: 45px;
-    left: 20px;
-    width: 280px;
+    top: 240px;
+    right: 20px;
+    width: 320px;
 }
 
 .checkpoint-info {
@@ -540,7 +541,7 @@ h1, h2, h3 {
 /* Runic Terminal Container (Bottom Center) */
 #runic-terminal-container {
     position: absolute;
-    bottom: 20px;
+    bottom: 180px;          /* lifted well off the bottom edge so the input + rune bar stay fully visible */
     left: 50%;
     transform: translateX(-50%);
     width: 600px;
@@ -757,3 +758,20 @@ h1, h2, h3 {
 ::-webkit-scrollbar-thumb:hover {
     background: #771111;
 }
+
+/* ---- Victory screen celebratory sunburst ---- */
+.victory-rays {
+    position: absolute;
+    inset: -60%;
+    margin: auto;
+    width: 220%;
+    height: 220%;
+    background: repeating-conic-gradient(from 0deg,
+        rgba(255, 214, 120, 0.12) 0deg 5deg,
+        rgba(255, 214, 120, 0.0) 5deg 11deg);
+    animation: victory-spin 26s linear infinite;
+    pointer-events: none;
+    z-index: 0;
+}
+@keyframes victory-spin { to { transform: rotate(360deg); } }
+#end-screen .end-content { position: relative; z-index: 1; }
